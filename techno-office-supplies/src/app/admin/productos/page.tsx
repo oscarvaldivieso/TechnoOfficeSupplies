@@ -35,25 +35,79 @@ export default function ProductosPage() {
     useEffect(() => { fetchAll(); }, [fetchAll]);
 
     // ── Export PDF ────────────────────────────────────────────────────────────
+
+    /**
+     * Convierte una URL de imagen externa (Cloudinary) a un data URL Base64.
+     * @react-pdf/renderer no puede cargar URLs externas directamente por CORS,
+     * pero sí puede renderizar data URLs Base64.
+     */
+    async function imageUrlToBase64(url: string): Promise<string> {
+        try {
+            // Usamos el proxy del servidor para evitar restricciones CORS con Cloudinary
+            const proxyUrl = `/api/image-proxy?url=${encodeURIComponent(url)}`;
+            const response = await fetch(proxyUrl);
+            if (!response.ok) return "";
+            const { dataUrl } = await response.json();
+            return dataUrl ?? "";
+        } catch {
+            return "";
+        }
+    }
+
     async function handleExportPDF() {
         setIsExporting(true);
         try {
-            // Dynamic import to keep react-pdf out of the server bundle
+            console.log("[PDF] Paso 1: Cargando fondo e imágenes...");
+            // Cargar imagen de fondo y productos en paralelo
+            const snapshot = products.map((p) => ({
+                ...p,
+                brandName: brands.find((b) => b.id === p.brand_id)?.name ?? "—",
+                categoryName: categories.find((c) => c.id === p.category_id)?.name ?? "—",
+            }));
+
+            const [backgroundBase64, productsWithBase64] = await Promise.all([
+                imageUrlToBase64("/images/fondo.jpeg"),
+                Promise.all(
+                    snapshot.map(async (p) => ({
+                        ...p,
+                        image: p.image ? await imageUrlToBase64(p.image) : "",
+                    }))
+                ),
+            ]);
+            console.log("[PDF] Paso 2: Imágenes listas. Fondo:", backgroundBase64.length > 0 ? "OK" : "no cargó");
+
+            console.log("[PDF] Paso 3: Importando react-pdf...");
             const [{ pdf }, { CatalogPDF }] = await Promise.all([
                 import("@react-pdf/renderer"),
                 import("@/components/products/CatalogPDF"),
             ]);
+            console.log("[PDF] Paso 4: Generando blob...");
             const blob = await pdf(
-                <CatalogPDF products={enrichedProducts} brands={brands} categories={categories} />
+                <CatalogPDF
+                    products={productsWithBase64}
+                    brands={brands}
+                    categories={categories}
+                    backgroundBase64={backgroundBase64}
+                />
             ).toBlob();
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `catalogo-productos-${new Date().toISOString().slice(0, 10)}.pdf`;
-            a.click();
-            URL.revokeObjectURL(url);
+            console.log("[PDF] Paso 5: Descargando...", blob.size, "bytes");
+
+            // El navegador puede bloquear a.click() con blob URLs después de operaciones async.
+            // Usamos FileReader para convertir a data URL, que es más compatible.
+            const reader = new FileReader();
+            reader.onload = () => {
+                const dataUrl = reader.result as string;
+                const a = document.createElement("a");
+                a.href = dataUrl;
+                a.download = `catalogo-productos-${new Date().toISOString().slice(0, 10)}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                console.log("[PDF] ✅ Descarga completada");
+            };
+            reader.readAsDataURL(blob);
         } catch (err) {
-            console.error(err);
+            console.error("[PDF] ❌ Error:", err);
             toast.error("Error al generar el PDF");
         } finally {
             setIsExporting(false);

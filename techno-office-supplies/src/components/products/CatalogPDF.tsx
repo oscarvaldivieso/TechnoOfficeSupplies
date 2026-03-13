@@ -6,239 +6,458 @@ import {
     Text,
     Image as PDFImage,
     StyleSheet,
-    Font,
+    Font,  // ← IMPORTANTE: Importar Font
 } from "@react-pdf/renderer";
 import type { Product, Brand, Category } from "@/types/product";
 
-// ── Palette ───────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// ── REGISTRAR FUENTES ONEST ──────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+
+Font.register({
+    family: "Onest",
+    fonts: [
+        {
+            src: "/fonts/Onest-Regular.ttf",  // Ruta desde public/ o src/fonts/
+            fontWeight: 400,
+        },
+        {
+            src: "/fonts/Onest-Bold.ttf",
+            fontWeight: 700,
+        },
+        // Opcional: Medium
+        {
+            src: "/fonts/Onest-Medium.ttf",
+            fontWeight: 500,
+        },
+        // Opcional: SemiBold
+        {
+            src: "/fonts/Onest-SemiBold.ttf",
+            fontWeight: 600,
+        },
+        // Opcional: Light
+        {
+            src: "/fonts/Onest-Light.ttf",
+            fontWeight: 300,
+        },
+    ],
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ── PALETA DE COLORES ────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+
 const C = {
-    bg: "#0f172a",        // slate-900
-    surface: "#1e293b",  // slate-800
-    border: "#334155",   // slate-700
-    accent: "#3b82f6",   // blue-500
-    accentLight: "#1d4ed8",
-    white: "#f8fafc",
-    muted: "#94a3b8",    // slate-400
-    dim: "#475569",      // slate-600
-    cardBg: "#1e293b",
+    neon: "#00f5ff",
+    neonGlow: "#00d9ff",
+    primary: "#0a84ff",
+    accent: "#6366f1",
+    purple: "#8b5cf6",
+    pink: "#ec4899",
+
+    bgDark: "#0a0e27",
+    cardBg: "#ffffff",
+
+    text: "#0f172a",
+    textMuted: "#64748b",
+    textLight: "#94a3b8",
+    white: "#ffffff",
+
+    border: "#e2e8f0",
+    borderAccent: "#cbd5e1",
+    gradient1: "#0ea5e9",
+    gradient2: "#8b5cf6",
 };
 
-// ── Styles ────────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// ── ESTILOS (Ahora usando Onest) ─────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+
 const s = StyleSheet.create({
     page: {
-        backgroundColor: C.bg,
-        paddingHorizontal: 32,
-        paddingVertical: 28,
-        fontFamily: "Helvetica",
+        fontFamily: "Onest",  // ← Cambiar de "Helvetica" a "Onest"
+        backgroundColor: "#0a0e27",
+        position: "relative",
     },
 
-    // ── Cover ──────────────────────────────────────────────────────────────────
-    coverPage: {
-        backgroundColor: C.bg,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 60,
+    bgImage: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        opacity: 0.08,
     },
-    coverAccentBar: {
-        width: 56,
-        height: 4,
-        backgroundColor: C.accent,
-        borderRadius: 2,
-        marginBottom: 24,
+
+    content: {
+        paddingHorizontal: 24,
+        paddingTop: 20,
+        paddingBottom: 54,
+    },
+
+    // ── Cover ─────────────────────────────────────────────────────────────────
+    coverContent: {
+        flex: 1,
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        paddingHorizontal: 56,
+        paddingVertical: 70,
+    },
+    coverChip: {
+        backgroundColor: C.neon,
+        borderRadius: 6,
+        paddingHorizontal: 18,
+        paddingVertical: 7,
+        marginBottom: 36,
+        borderWidth: 1,
+        borderColor: C.neonGlow,
+    },
+    coverChipText: {
+        fontSize: 10,
+        color: C.bgDark,
+        fontWeight: 700,  // ← Usar fontWeight en lugar de fontFamily: "Onest-Bold"
+        letterSpacing: 4,
+        textTransform: "uppercase",
     },
     coverTitle: {
-        fontSize: 36,
+        fontSize: 56,
         color: C.white,
-        fontFamily: "Helvetica-Bold",
+        fontWeight: 700,  // ← Bold
         textAlign: "center",
-        letterSpacing: 1,
+        lineHeight: 1.1,
+        letterSpacing: 3,
+    },
+    coverTitleAccent: {
+        fontSize: 56,
+        color: C.neon,
+        fontWeight: 700,  // ← Bold
+        textAlign: "center",
+        lineHeight: 1.1,
+        letterSpacing: 3,
     },
     coverSubtitle: {
-        fontSize: 14,
-        color: C.muted,
+        fontSize: 15,
+        color: C.textLight,
         textAlign: "center",
-        marginTop: 10,
+        marginTop: 18,
+        letterSpacing: 0.8,
+        fontWeight: 400,  // ← Regular
+    },
+    coverRule: {
+        width: "100%",
+        height: 2,
+        backgroundColor: C.neon,
+        marginTop: 52,
+        marginBottom: 40,
+        opacity: 0.4,
+    },
+    coverStatsRow: {
+        flexDirection: "row",
+        gap: 56,
+    },
+    coverStat: {
+        alignItems: "center",
+        gap: 7,
+    },
+    coverStatNum: {
+        fontSize: 40,
+        color: C.neon,
+        fontWeight: 700,  // ← Bold
+    },
+    coverStatLabel: {
+        fontSize: 10,
+        color: C.textLight,
+        letterSpacing: 2.5,
+        textTransform: "uppercase",
+        fontWeight: 500,  // ← Medium
     },
     coverDate: {
-        fontSize: 10,
-        color: C.dim,
-        textAlign: "center",
-        marginTop: 8,
-    },
-    coverDivider: {
-        width: 120,
-        height: 1,
-        backgroundColor: C.border,
-        marginTop: 40,
-        marginBottom: 16,
-    },
-    coverStats: {
+        marginTop: 70,
         fontSize: 11,
-        color: C.muted,
-        textAlign: "center",
+        color: C.textLight,
+        letterSpacing: 1.2,
+        fontWeight: 400,  // ← Regular
     },
 
-    // ── Page header ────────────────────────────────────────────────────────────
+    // ── Page Header ───────────────────────────────────────────────────────────
     pageHeader: {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        marginBottom: 18,
-        paddingBottom: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: C.border,
+        paddingHorizontal: 24,
+        paddingVertical: 14,
+        backgroundColor: "rgba(0, 245, 255, 0.05)",
+        borderBottomWidth: 2,
+        borderBottomColor: C.neon,
+        marginBottom: 0,
     },
     pageHeaderTitle: {
-        fontSize: 10,
-        color: C.muted,
-        fontFamily: "Helvetica-Bold",
-        letterSpacing: 1.5,
+        fontSize: 11,
+        color: C.white,
+        fontWeight: 700,  // ← Bold
+        letterSpacing: 3.5,
         textTransform: "uppercase",
     },
-    pageHeaderAccent: {
-        fontSize: 10,
-        color: C.accent,
+    pageHeaderBrand: {
+        fontSize: 11,
+        color: C.neon,
+        fontWeight: 700,  // ← Bold
+        letterSpacing: 1.8,
+    },
+
+    // ── Category Section ──────────────────────────────────────────────────────
+    categorySection: {
+        marginTop: 28,
+        marginBottom: 18,
+    },
+    categoryHeader: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 12,
+        marginBottom: 16,
+        paddingHorizontal: 2,
+    },
+    categoryDot: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: C.neon,
+    },
+    categoryTitle: {
+        fontSize: 25,
+        color: C.white,
+        fontWeight: 700,  // ← Bold
+        textTransform: "uppercase",
+    },
+    categoryUnderline: {
+        height: 2,
+        backgroundColor: C.neon,
+        marginLeft: 12,
+        flex: 1,
+        opacity: 0.3,
     },
 
     // ── Grid ──────────────────────────────────────────────────────────────────
     grid: {
         flexDirection: "row",
         flexWrap: "wrap",
-        gap: 12,
+        gap: 16,
     },
 
-    // ── Product card ──────────────────────────────────────────────────────────
+    // ── Card ──────────────────────────────────────────────────────────────────
     card: {
-        width: "47.5%",
+        width: "48%",
         backgroundColor: C.cardBg,
-        borderRadius: 10,
+        borderRadius: 12,
         overflow: "hidden",
+        position: "relative",
         borderWidth: 1,
         borderColor: C.border,
     },
+    cardCornerDecor: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: 40,
+        height: 40,
+        backgroundColor: C.neon,
+        opacity: 0.1,
+    },
+    cardImageWrap: {
+        position: "relative",
+        width: "100%",
+        height: 150,
+        backgroundColor: "#f8fafc",
+        borderBottomWidth: 3,
+        borderBottomColor: C.neon,
+    },
     cardImage: {
         width: "100%",
-        height: 130,
+        height: 150,
         objectFit: "cover",
-        backgroundColor: "#0f1a2e",
     },
-    cardImagePlaceholder: {
+    cardPlaceholder: {
         width: "100%",
-        height: 130,
-        backgroundColor: "#162032",
-        display: "flex",
+        height: 150,
+        backgroundColor: "#f1f5f9",
         alignItems: "center",
         justifyContent: "center",
     },
-    cardImagePlaceholderText: {
+    cardPlaceholderIcon: {
+        fontSize: 32,
+        color: C.textMuted,
+        marginBottom: 8,
+    },
+    cardPlaceholderText: {
         fontSize: 9,
-        color: C.dim,
+        color: C.textMuted,
+        letterSpacing: 2,
+        textTransform: "uppercase",
+        fontWeight: 500,  // ← Medium
+    },
+    cardSkuBadge: {
+        position: "absolute",
+        top: 12,
+        right: 12,
+        backgroundColor: C.bgDark,
+        borderRadius: 6,
+        paddingHorizontal: 9,
+        paddingVertical: 4,
+        borderWidth: 1.5,
+        borderColor: C.neon,
+    },
+    cardSkuText: {
+        fontSize: 10,
+        color: C.neon,
+        fontWeight: 700,  // ← Bold
+        textTransform: "uppercase",
     },
     cardBody: {
-        padding: 10,
-        gap: 4,
+        padding: 14,
+        gap: 8,
     },
     cardName: {
-        fontSize: 11,
-        color: C.white,
-        fontFamily: "Helvetica-Bold",
-        lineHeight: 1.35,
+        fontSize: 15,
+        textTransform: "uppercase",
+        color: C.text,
+        fontWeight: 700,  // ← Bold
+        lineHeight: 1.2,
     },
-    cardRow: {
+    cardDescription: {
+        fontSize: 9,
+        color: C.textMuted,
+        fontWeight: 400,
+        lineHeight: 1.4,
+        marginTop: 2,
+    },
+    cardDivider: {
+        height: 1,
+        backgroundColor: C.border,
+        marginVertical: 1,
+    },
+    cardMetaRow: {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        marginTop: 3,
+        gap: 8,
     },
     cardBrand: {
-        fontSize: 9,
-        color: C.accent,
-        fontFamily: "Helvetica-Bold",
+        fontSize: 11,
+        color: C.primary,
+        fontWeight: 600,  // ← SemiBold
+        letterSpacing: 0.4,
     },
-    cardSku: {
-        fontSize: 8,
-        color: C.dim,
-        fontFamily: "Helvetica",
+    cardFooterBar: {
+        flexDirection: "row",
+        gap: 4,
+        paddingHorizontal: 14,
+        paddingBottom: 10,
     },
-    cardCategory: {
-        fontSize: 8,
-        color: C.muted,
-        backgroundColor: "#263248",
-        borderRadius: 4,
-        paddingHorizontal: 5,
-        paddingVertical: 2,
-        marginTop: 4,
-        alignSelf: "flex-start",
-    },
-    cardDesc: {
-        fontSize: 8,
-        color: C.muted,
-        lineHeight: 1.4,
-        marginTop: 4,
+    cardFooterDot: {
+        width: 6,
+        height: 6,
+        borderRadius: 3,
+        backgroundColor: C.neon,
     },
 
-    // ── Footer ────────────────────────────────────────────────────────────────
+    // ── Page Footer ───────────────────────────────────────────────────────────
     pageFooter: {
         position: "absolute",
         bottom: 18,
-        left: 32,
-        right: 32,
+        left: 24,
+        right: 24,
         flexDirection: "row",
         justifyContent: "space-between",
-        borderTopWidth: 1,
-        borderTopColor: C.border,
-        paddingTop: 8,
+        alignItems: "center",
+        borderTopWidth: 2,
+        borderTopColor: C.neon,
+        paddingTop: 9,
     },
     footerText: {
-        fontSize: 8,
-        color: C.dim,
+        fontSize: 8.5,
+        color: C.textLight,
+        letterSpacing: 0.6,
+        fontWeight: 400,  // ← Regular
+    },
+    footerPage: {
+        fontSize: 8.5,
+        color: C.neon,
+        fontWeight: 700,  // ← Bold
+        letterSpacing: 0.6,
     },
 });
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// ── RESTO DEL CÓDIGO (sin cambios) ───────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
 
 interface EnrichedProduct extends Product {
     brandName?: string;
     categoryName?: string;
 }
 
+interface CatalogPDFProps {
+    products: EnrichedProduct[];
+    brands: Brand[];
+    categories: Category[];
+    backgroundBase64?: string;
+}
+
 function ProductCard({ product }: { product: EnrichedProduct }) {
-    const hasImage = product.image && product.image.trim() !== "";
+    const hasImage = !!product.image?.trim();
 
     return (
         <View style={s.card}>
-            {hasImage ? (
-                <PDFImage src={product.image} style={s.cardImage} />
-            ) : (
-                <View style={s.cardImagePlaceholder}>
-                    <Text style={s.cardImagePlaceholderText}>Sin imagen</Text>
-                </View>
-            )}
+            <View style={s.cardCornerDecor} />
+
+            <View style={s.cardImageWrap}>
+                {hasImage ? (
+                    <PDFImage src={product.image} style={s.cardImage} />
+                ) : (
+                    <View style={s.cardPlaceholder}>
+                        <Text style={s.cardPlaceholderIcon}>📦</Text>
+                        <Text style={s.cardPlaceholderText}>Sin Imagen</Text>
+                    </View>
+                )}
+
+                {product.sku && (
+                    <View style={s.cardSkuBadge}>
+                        <Text style={s.cardSkuText}>{product.sku}</Text>
+                    </View>
+                )}
+            </View>
 
             <View style={s.cardBody}>
                 <Text style={s.cardName}>{product.name}</Text>
 
-                <View style={s.cardRow}>
-                    <Text style={s.cardBrand}>{product.brandName ?? "—"}</Text>
-                    <Text style={s.cardSku}>{product.sku}</Text>
-                </View>
-
-                {product.categoryName && product.categoryName !== "—" && (
-                    <Text style={s.cardCategory}>{product.categoryName}</Text>
+                {product.description && (
+                    <Text style={s.cardDescription}>
+                        {product.description}
+                    </Text>
                 )}
 
+                <View style={s.cardDivider} />
+
+                <View style={s.cardMetaRow}>
+                    <Text style={s.cardBrand}>{product.brandName ?? "—"}</Text>
+                </View>
+            </View>
+
+            <View style={s.cardFooterBar}>
+                <View style={s.cardFooterDot} />
+                <View style={s.cardFooterDot} />
+                <View style={s.cardFooterDot} />
             </View>
         </View>
     );
 }
 
-function PageHeader({ page, total }: { page: number; total: number }) {
+function PageHeader() {
     return (
         <View style={s.pageHeader} fixed>
             <Text style={s.pageHeaderTitle}>Catálogo de Productos</Text>
-            <Text style={s.pageHeaderAccent}>TechnoOffice Supplies</Text>
+            <Text style={s.pageHeaderBrand}>TechnoOffice Supplies</Text>
         </View>
     );
 }
@@ -247,59 +466,104 @@ function PageFooter({ date }: { date: string }) {
     return (
         <View style={s.pageFooter} fixed>
             <Text style={s.footerText}>TechnoOffice Supplies · {date}</Text>
-            <Text style={s.footerText} render={({ pageNumber, totalPages }) =>
-                `Página ${pageNumber} de ${totalPages}`
-            } />
+            <Text
+                style={s.footerPage}
+                render={({ pageNumber, totalPages }) => `Página ${pageNumber} de ${totalPages}`}
+            />
         </View>
     );
 }
 
-// ── Main Document ─────────────────────────────────────────────────────────────
-
-interface CatalogPDFProps {
-    products: EnrichedProduct[];
-    brands: Brand[];
-    categories: Category[];
+function BackgroundImage({ src }: { src?: string }) {
+    if (!src) return null;
+    return <PDFImage src={src} style={s.bgImage} fixed />;
 }
 
-export function CatalogPDF({ products, brands, categories }: CatalogPDFProps) {
-    const date = new Date().toLocaleDateString("es-MX", {
+export function CatalogPDF({ products, brands, categories, backgroundBase64 }: CatalogPDFProps) {
+    const date = new Date().toLocaleDateString("es-HN", {
         year: "numeric", month: "long", day: "numeric",
     });
-    const uniqueBrands = [...new Set(products.map(p => p.brandName).filter(Boolean))].length;
-    const uniqueCats = [...new Set(products.map(p => p.categoryName).filter(Boolean))].length;
+
+    const productsByCategory = new Map<string, EnrichedProduct[]>();
+
+    products.forEach(product => {
+        const categoryName = product.categoryName || "Sin Categoría";
+        if (!productsByCategory.has(categoryName)) {
+            productsByCategory.set(categoryName, []);
+        }
+        productsByCategory.get(categoryName)!.push(product);
+    });
+
+    const sortedCategories = Array.from(productsByCategory.keys()).sort();
+
+    const uniqueBrands = [...new Set(products.map((p) => p.brandName).filter(Boolean))].length;
+    const uniqueCats = sortedCategories.length;
 
     return (
         <Document
             title="Catálogo de Productos — TechnoOffice Supplies"
             author="TechnoOffice Supplies"
         >
-            {/* ── Cover Page ── */}
-            <Page size="A4" style={[s.page, s.coverPage]}>
-                <View style={s.coverAccentBar} />
-                <Text style={s.coverTitle}>Catálogo de{"\n"}Productos</Text>
-                <Text style={s.coverSubtitle}>TechnoOffice Supplies</Text>
-                <Text style={s.coverDate}>{date}</Text>
-
-                <View style={s.coverDivider} />
-
-                <Text style={s.coverStats}>
-                    {products.length} productos  ·  {uniqueBrands} marcas  ·  {uniqueCats} categorías
-                </Text>
-            </Page>
-
-            {/* ── Products Page ── */}
             <Page size="A4" style={s.page}>
-                <PageHeader page={1} total={1} />
+                <BackgroundImage src={backgroundBase64} />
 
-                <View style={s.grid}>
-                    {products.map((p) => (
-                        <ProductCard key={p.id} product={p} />
-                    ))}
+                <View style={s.coverContent}>
+                    <View style={s.coverChip}>
+                        <Text style={s.coverChipText}>Catálogo Oficial</Text>
+                    </View>
+
+                    <Text style={s.coverTitle}>TECHNO{"\n"}</Text>
+                    <Text style={s.coverTitleAccent}>OFFICE SUPPLIES</Text>
+                    <Text style={s.coverSubtitle}>
+                        Soluciones tecnológicas para tu empresa
+                    </Text>
+
+                    <View style={s.coverRule} />
+
+
+                    <Text style={s.coverDate}>{date}</Text>
                 </View>
-
-                <PageFooter date={date} />
             </Page>
+
+            {sortedCategories.map((categoryName) => {
+                const categoryProducts = productsByCategory.get(categoryName)!;
+
+                const productsPerPage = 4;
+                const pageGroups: EnrichedProduct[][] = [];
+
+                for (let i = 0; i < categoryProducts.length; i += productsPerPage) {
+                    pageGroups.push(categoryProducts.slice(i, i + productsPerPage));
+                }
+
+                return pageGroups.map((group, pageIdx) => (
+                    <Page
+                        key={`${categoryName}-${pageIdx}`}
+                        size="A4"
+                        style={s.page}
+                    >
+                        <BackgroundImage src={backgroundBase64} />
+                        <PageHeader />
+
+                        <View style={s.content}>
+                            {pageIdx === 0 && (
+                                <View style={s.categoryHeader}>
+                                    <View style={s.categoryDot} />
+                                    <Text style={s.categoryTitle}>{categoryName}</Text>
+                                    <View style={s.categoryUnderline} />
+                                </View>
+                            )}
+
+                            <View style={s.grid}>
+                                {group.map((p) => (
+                                    <ProductCard key={p.id} product={p} />
+                                ))}
+                            </View>
+                        </View>
+
+                        <PageFooter date={date} />
+                    </Page>
+                ));
+            })}
         </Document>
     );
 }
