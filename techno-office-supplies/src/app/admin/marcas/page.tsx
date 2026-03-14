@@ -74,8 +74,8 @@ function BrandCard({
                     </div>
                 )}
 
-                {/* Hover action overlay */}
-                <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 backdrop-blur-sm">
+                {/* Hover / tap action overlay — always visible on mobile, hover-only on desktop */}
+                <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/60 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200 backdrop-blur-sm">
                     <Button
                         size="sm"
                         variant="secondary"
@@ -178,7 +178,7 @@ export default function MarcasPage() {
             </div>
 
             {/* ── Search ── */}
-            <div className="relative max-w-xs">
+            <div className="relative w-full max-w-xs">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 pointer-events-none" />
                 <Input
                     placeholder="Buscar marca..."

@@ -190,9 +190,9 @@ export default function ProductosPage() {
     return (
         <div className="space-y-6">
             {/* Header ───────────────────────────────────────────────────── */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-white">Catálogo de Productos</h1>
+                    <h1 className="text-xl font-bold text-white sm:text-2xl">Catálogo de Productos</h1>
                     <p className="text-sm text-slate-400 mt-1">
                         {isLoading
                             ? "Cargando..."
@@ -206,13 +206,16 @@ export default function ProductosPage() {
                         onClick={handleExportPDF}
                         disabled={isExporting || isLoading || products.length === 0}
                     >
-                        {isExporting
-                            ? <><Loader2 className="h-4 w-4 animate-spin" />Generando...</>
-                            : <><FileDown className="h-4 w-4" />Exportar PDF</>}
+                        {isExporting ? (
+                            <><Loader2 className="h-4 w-4 animate-spin" /><span className="hidden sm:inline">Generando...</span></>
+                        ) : (
+                            <><FileDown className="h-4 w-4" /><span className="hidden sm:inline">Exportar PDF</span></>
+                        )}
                     </Button>
                     <Button className="gap-2" onClick={openCreate}>
                         <Plus className="h-4 w-4" />
-                        Nuevo producto
+                        <span className="hidden sm:inline">Nuevo producto</span>
+                        <span className="sm:hidden">Nuevo</span>
                     </Button>
                 </div>
             </div>

@@ -98,8 +98,8 @@ function CategoryCard({
                 {productCount}p
             </span>
 
-            {/* Actions — appear on hover */}
-            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 shrink-0">
+            {/* Actions — always visible on mobile, hover-only on desktop */}
+            <div className="flex gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-150 shrink-0">
                 <Button
                     size="sm"
                     variant="ghost"
@@ -186,7 +186,7 @@ export default function CategoriasPage() {
             </div>
 
             {/* ── Search ── */}
-            <div className="relative max-w-xs">
+            <div className="relative w-full max-w-xs">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 pointer-events-none" />
                 <Input
                     placeholder="Buscar categoría..."
