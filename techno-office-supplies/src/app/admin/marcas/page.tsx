@@ -58,7 +58,7 @@ function BrandCard({
 }) {
     return (
         <div className="group relative overflow-hidden rounded-xl border border-slate-700/60 bg-slate-900 shadow-md transition-all duration-300 hover:border-slate-600 hover:shadow-lg hover:-translate-y-0.5">
-            {/* Logo area — fills full width */}
+            {/* Logo area — fills full width, no overlay */}
             <div className="relative h-36 w-full bg-slate-800 overflow-hidden">
                 {brand.logoUrl ? (
                     <Image
@@ -73,32 +73,30 @@ function BrandCard({
                         <Tag className="h-10 w-10 text-slate-600" />
                     </div>
                 )}
+            </div>
 
-                {/* Hover / tap action overlay — always visible on mobile, hover-only on desktop */}
-                <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/60 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200 backdrop-blur-sm">
+            {/* Info strip — name + product count + action buttons always visible */}
+            <div className="px-3 py-2 flex items-center gap-2">
+                <p className="text-sm font-medium text-white truncate flex-1">{brand.name}</p>
+                <span className="shrink-0 text-xs text-slate-500">{productCount}p</span>
+                <div className="flex gap-1 shrink-0">
                     <Button
                         size="sm"
-                        variant="secondary"
+                        variant="ghost"
                         onClick={onEdit}
-                        className="h-8 w-8 p-0 bg-white/10 hover:bg-white/20 border-0 text-white"
+                        className="h-7 w-7 p-0 text-slate-400 hover:text-white hover:bg-slate-700"
                     >
                         <Pencil className="h-3.5 w-3.5" />
                     </Button>
                     <Button
                         size="sm"
-                        variant="destructive"
+                        variant="ghost"
                         onClick={onDelete}
-                        className="h-8 w-8 p-0"
+                        className="h-7 w-7 p-0 text-slate-400 hover:text-red-400 hover:bg-red-400/10"
                     >
                         <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                 </div>
-            </div>
-
-            {/* Info strip */}
-            <div className="px-3 py-2.5 flex items-center justify-between gap-2">
-                <p className="text-sm font-medium text-white truncate">{brand.name}</p>
-                <span className="shrink-0 text-xs text-slate-500">{productCount}p</span>
             </div>
         </div>
     );
